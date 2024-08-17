@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Agendamentos</title>
+    </h:head>
+    <h:body>
+        <h1>Agendamentos</h1>
+        <h:form>
+            <p:column>
+                <p:outputLabel><strong>Tipo de  Serviço</strong></p:outputLabel>
+                <p:selectOneMenu value="#{buscaBean.tipodeservicoselecionado}"
+                                 converter="#{TipodeServicoConverter}" requiredMessage="Faltou selecionar o Tipo de Serviço" required="true">
+                    <f:selectItems value="#{aplicacao.itensTiposdeServicos}"/>
+                    <p:ajax event="change" immediate="true" update="equipe"/>
+                    <p:ajax event="change" immediate="true" update="periodo"/>
+                    <p:ajax event="change" immediate="true" update="responsavel"/>
+                    <p:ajax event="change" immediate="true" update="valorperiodo"/>
+                    <p:ajax event="change" immediate="true" update="totalservico"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column><br/>
+                <p:outputLabel><strong>Equipe</strong></p:outputLabel>
+                <p:selectOneMenu id="equipe"
+                                 value="#{buscaBean.equipeSelecionada}"
+                                 converter="#{EquipeConverter}" requiredMessage="Faltou selecionar uma Equipe" required="true">
+                    <f:selectItems value="#{buscaBean.selectEquipes}"/>
+                    <p:ajax event="change" immediate="true" update="periodo"/>
+                    <p:ajax event="change" immediate="true" update="responsavel"/>
+                    <p:ajax event="change" immediate="true" update="valorperiodo"/>
+                    <p:ajax event="change" immediate="true" update="totalservico"/>
+                </p:selectOneMenu>
+
+            </p:column><br/>
+            <br/>
+            <p:column>
+
+                <p:outputLabel><strong>Responsável:</strong></p:outputLabel>
+                <p:outputLabel id="responsavel"  value=" #{buscaBean.responsavel}" />
+                <br/>
+                <p:outputLabel><strong>Valor do Serviço por periodo:</strong></p:outputLabel>
+                <p:outputLabel id="valorperiodo"  value=" #{buscaBean.valorservico}" />
+                <br/>
+                <p:outputLabel><strong>Periodo:</strong></p:outputLabel>
+
+                <p:selectOneRadio id="periodo" value="#{buscaBean.periodo}" requiredMessage="Faltou selecionar um periodo" required="true">
+                    <f:selectItem itemLabel="Manhã" itemValue="manha" />
+                    <f:selectItem itemLabel="Tarde" itemValue="tarde" />
+                    <f:selectItem itemLabel="Dia Inteiro" itemValue="diainteiro" />
+                    <p:ajax event="change" immediate="true" update="totalservico"/>
+                </p:selectOneRadio>
+                <br/>
+                <p:outputLabel><strong>Data:</strong></p:outputLabel>
+                <p:calendar value="#{buscaBean.data}"
+                            id="vendorStartDateInputTxt"
+                            pattern="dd/MM/yyyy"
+                            mode="popup"
+                            requiredMessage="Faltou preencher a Data"
+                            required="true"
+                            mindate="#{buscaBean.now}"
+                            validatorMessage="Data Inválida. A data selecionada deve ser maior ou igual à data atual e deve ser agendado hoje a tarde ou depois."
+                            validator="#{buscaBean.validateData}">
+                    <f:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+                </p:calendar>
+                <br/><br/>
+                <p:outputLabel><strong>Contratante:</strong></p:outputLabel>
+                <p:inputText value="#{buscaBean.contratante}" requiredMessage="Faltou prencher o Contratante" required="true" />
+                <br/><br/>
+                <p:outputLabel><strong>Telefone de Contato:</strong></p:outputLabel>
+                <p:inputMask mask="(99)99999-9999" value="#{buscaBean.telefonecontato}" requiredMessage="Faltou prencher o telefone de contato" required="true"/>
+                <br/><br/>
+                <p:outputLabel><strong>Email:</strong></p:outputLabel>
+                <p:inputText value="#{buscaBean.email}" requiredMessage="Faltou prencher o email" required="true" />
+                <br/><br/>
+                <p:outputLabel><strong>Endereço do Serviço:</strong></p:outputLabel>
+                <p:inputText value="#{buscaBean.enderecodoservico}" requiredMessage="Faltou prencher o endereço" required="true"/>
+                <br/><br/>
+                <p:outputLabel><strong>Total Serviço:</strong></p:outputLabel>
+                <p:outputLabel id="totalservico"  value=" #{buscaBean.totalServico}" />
+            </p:column><br/><br/>
+            <p:commandButton value="Confirmar" 
+                             update=":resultadoAgendamentos"  action="#{agendamentoBean.confirmarAgendamento()}"/>
+            <p:commandButton value="Limpar" action="#{buscaBean.limparContexto()}" />
+            <p:growl showDetail="true" showSummary="true" autoUpdate="true"/>
+        </h:form>
+        <br/>
+        <br/>
+        <p:dataTable id="resultadoAgendamentos" value="#{agendamentoBean.agendamentos}" var="agen">
+            <p:column headerText="Tipo De Serviço">
+                <h:outputText value="#{agen.tipodeservico.descricaodoservico}"/>
+            </p:column>                
+            <p:column headerText="Equipe">
+                <h:outputText value="#{agen.equipe.nomedaequipe}"/>
+            </p:column>
+            <p:column headerText="Responsavel">
+                <h:outputText value="#{agen.equipe.responsavel}"/>
+            </p:column>
+            <p:column headerText="Data">
+                <h:outputText value="#{agen.data}">
+                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                </h:outputText>
+            </p:column>            
+            <p:column headerText="Periodo">
+                <h:outputText value="#{agen.periodo}"/>
+            </p:column>
+            <p:column headerText="Cliente">
+                <h:outputText value="#{agen.contratante}"/>
+            </p:column>
+        </p:dataTable>
+
+
+    </h:body>
+</html>
+
